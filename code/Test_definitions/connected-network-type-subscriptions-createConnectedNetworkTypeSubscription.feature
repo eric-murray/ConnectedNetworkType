@@ -124,7 +124,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the notification property "$.data.subscriptionId" is equal to "id"
     And the notification request property "$.data.terminationReason" is equal to "MAX_EVENTS_REACHED"
 
-@connected_network_type_subscriptions_06_subscription_creation_initial_event
+ @connected_network_type_subscriptions_06_subscription_creation_initial_event
   Scenario: Receive initial event notification on creation
     Given the API supports initial events to be sent
     And a valid subscription request body with property "$.config.initialEvent" set to true
@@ -409,7 +409,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
 # Error code 422
 ##################
 
-@connected_network_type_subscriptions_422.01_multi_event_not_supported
+  @connected_network_type_subscriptions_422.01_multi_event_not_supported
   Scenario: Multi-event subscriptions are not supported
     Given a valid 2- or 3-legged access token
     And a request body that is compliant with the OAS schema at "#/component/schemas/SubscriptionRequest"
@@ -420,7 +420,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.code" is "MULTIEVENT_SUBSCRIPTION_NOT_SUPPORTED"
     And the response property "$.message" contains a user friendly text
 
-@connected_network_type_subscriptions_422.02_creation_with_private_jwt_key_not_configured
+  @connected_network_type_subscriptions_422.02_creation_with_private_jwt_key_not_configured
   Scenario: Private JWT Key not configured for subscription creation
     Given the API provider requires the use of a Private JWT key mechanism for subscription creation authentication
     And the Private JWT key mechanism is not pre-configured in the environment
