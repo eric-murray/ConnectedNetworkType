@@ -124,7 +124,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the notification property "$.data.subscriptionId" is equal to "id"
     And the notification request property "$.data.terminationReason" is equal to "MAX_EVENTS_REACHED"
 
- @connected_network_type_subscriptions_06_subscription_creation_initial_event
+  @connected_network_type_subscriptions_06_subscription_creation_initial_event
   Scenario: Receive initial event notification on creation
     Given the API supports initial events to be sent
     And a valid subscription request body with property "$.config.initialEvent" set to true
