@@ -79,6 +79,9 @@ info:
     `429 TOO_MANY_REQUESTS`:
     - The rate at which the API consumer is sending requests has exceeded that allowed by the API provider. Try again later.
 
+    `503 UNAVAILABLE`:
+    - The API provider is unable to provide the connected network type for the requested device at this time. Try again later.
+
     <!-- CAMARA:MANDATORY:authorization-and-authentication:BEGIN -->
 
     # Authorization and authentication
