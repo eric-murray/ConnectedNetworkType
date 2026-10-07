@@ -51,7 +51,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation retri
     And the response property "$.id" is equal to "id"
     And the response property "$.config.subscriptionDetail.device" is not present
 
-@connected_network_type_subscriptions_03_Operation_to_retrieve_subscription_based_on_an_existing_subscription-id_access_token_sink_credential_returned
+  @connected_network_type_subscriptions_03_Operation_to_retrieve_subscription_based_on_an_existing_subscription-id_access_token_sink_credential_returned
   # Some implementations may decide to not return the sinkCredential in the response (data minimization principle)
   Scenario: Get a subscription based on existing subscription-id, with ACCESSTOKEN sinkCredential returned.
     Given the path parameter "subscriptionId" is set to the identifier of an existing roaming status subscription
