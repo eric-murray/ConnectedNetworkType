@@ -20,6 +20,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the resource "/connected-network-type-subscriptions/vwip"
     And the header "Authorization" is set to a valid access token
     And the header "x-correlator" complies with the schema at "#/components/schemas/XCorrelator"
+    And the request body is compliant with the OAS schema at "#/components/schemas/SubscriptionRequest"
 
 ##########################
 # Happy path scenarios
@@ -107,7 +108,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the subscription property "$.sink" is a valid callback URL
     When the subscriptionExpireTime is reached
     Then a subscription termination event notification is sent to the callback URL
-    And the notification body complies with the OAS schema at "#/components/schemas/EventSubscriptionEnds"
+    And the notification body complies with the OAS schema at "#/components/schemas/EventSubscriptionEnded"
     And the notification property "$.type" is "org.camaraproject.connected-network-type-subscriptions.v0.subscription-ended"
     And the notification property "$.data.subscriptionId" is equal to "id"
     And the notification property "$.data.terminationReason" is equal to "SUBSCRIPTION_EXPIRED"
@@ -119,7 +120,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the subscription property "$.sink" is a valid callback URL
     When a single notification corresponding to subscription property "$.type" has been sent to the callback URL
     Then a subscription termination event notification is sent to the callback URL
-    And the notification body complies with the OAS schema at "#/components/schemas/EventSubscriptionEnds"
+    And the notification body complies with the OAS schema at "#/components/schemas/EventSubscriptionEnded"
     And the notification property "$.type" is equal to "org.camaraproject.connected-network-type-subscriptions.v0.subscription-ended"
     And the notification property "$.data.subscriptionId" is equal to "id"
     And the notification request property "$.data.terminationReason" is equal to "MAX_EVENTS_REACHED"
@@ -181,14 +182,14 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response body property "$.sinkCredential.credentialType" is set to value "PRIVATE_JWT_KEY"
     And the response body property "$.sinkCredential.jwksUri" is set to a valid value
 
-################
+##########################################################
 # Error scenarios for management of input parameter device
-##################
+##########################################################
 
   @connected_network_type_subscriptions_C01.01_device_empty
   Scenario: The device value is an empty object
     Given the header "Authorization" is set to a valid access token which does not identify a single device
-    And the request body property "$.device" is set to: {}
+    And the request body property "$.config.subscriptionDetail.device" is set to: {}
     When the request "createConnectedNetworkTypeSubscription" is sent
     Then the response status code is 400
     And the response property "$.status" is 400
@@ -206,17 +207,17 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.message" contains a user friendly text
 
     Examples:
-      | device_identifier          | oas_spec_schema                             |
-      | $.device.phoneNumber       | #/components/schemas/PhoneNumber             |
-      | $.device.ipv4Address       | #/components/schemas/DeviceIpv4Addr          |
-      | $.device.ipv6Address       | #/components/schemas/DeviceIpv6Address       |
-      | $.device.networkIdentifier | #/components/schemas/NetworkAccessIdentifier |
+      | device_identifier                                          | oas_spec_schema                              |
+      | $.config.subscriptionDetail.device.phoneNumber             | #/components/schemas/PhoneNumber             |
+      | $.config.subscriptionDetail.device.ipv4Address             | #/components/schemas/DeviceIpv4Address       |
+      | $.config.subscriptionDetail.device.ipv6Address             | #/components/schemas/DeviceIpv6Address       |
+      | $.config.subscriptionDetail.device.networkAccessIdentifier | #/components/schemas/NetworkAccessIdentifier |
 
   # This scenario may happen e.g. with 2-legged access tokens, which do not identify a single device.
   @connected_network_type_subscriptions_C01.03_device_not_found
   Scenario: Some identifier cannot be matched to a device
     Given the header "Authorization" is set to a valid access token which does not identify a single device
-    And the request body property "$.device" is compliant with the schema but does not identify a device whose connectivity is managed by the API provider
+    And the request body property "$.config.subscriptionDetail.device" is compliant with the schema but does not identify a device whose connectivity is managed by the API provider
     When the request "createConnectedNetworkTypeSubscription" is sent
     Then the response status code is 404
     And the response property "$.status" is 404
@@ -226,7 +227,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
   @connected_network_type_subscriptions_C01.04_unnecessary_device
   Scenario: Device not to be included when it can be deduced from the access token
     Given the header "Authorization" is set to a valid access token identifying a device
-    And the request body property "$.device" is also set to a valid device, which may or may not be the same device
+    And the request body property "$.config.subscriptionDetail.device" is also set to a valid device, which may or may not be the same device
     When the request "createConnectedNetworkTypeSubscription" is sent
     Then the response status code is 422
     And the response property "$.status" is 422
@@ -236,7 +237,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
   @connected_network_type_subscriptions_C01.05_missing_device
   Scenario: Device not included and cannot be deduced from the access token
     Given the header "Authorization" is set to a valid access token which does not identify a single device
-    And the request body property "$.device" is not included
+    And the request body property "$.config.subscriptionDetail.device" is not included
     When the request "createConnectedNetworkTypeSubscription" is sent
     Then the response status code is 422
     And the response property "$.status" is 422
@@ -247,7 +248,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
   Scenario: None of the provided device identifiers is supported by the implementation
     Given that some types of device identifiers are not supported by the implementation
     And the header "Authorization" is set to a valid access token which does not identify a single device
-    And the request body property "$.device" only includes device identifiers not supported by the implementation
+    And the request body property "$.config.subscriptionDetail.device" only includes device identifiers not supported by the implementation
     When the request "createConnectedNetworkTypeSubscription" is sent
     Then the response status code is 422
     And the response property "$.status" is 422
@@ -269,7 +270,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
 # Error code 400
 ##################
 
-  @connected_network_type_subscriptions_400.1_create_subscription_with_invalid_parameter
+  @connected_network_type_subscriptions_400.01_create_subscription_with_invalid_parameter
   Scenario: Create subscription with invalid parameter
     Given the request body is not compliant with the schema "#/components/schemas/SubscriptionRequest"
     When the request "createConnectedNetworkTypeSubscription" is sent
@@ -278,7 +279,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @connected_network_type_subscriptions_400.2_create_subscription_with_invalid_subscription_expire_time
+  @connected_network_type_subscriptions_400.02_create_subscription_with_invalid_subscription_expire_time
   Scenario: Expiry time in past
     Given the request body is compliant with the schema "#/components/schemas/SubscriptionRequest"
     And the request property "$.config.subscriptionExpireTime" is set to a time in the past
@@ -288,7 +289,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @connected_network_type_subscriptions_400.3_invalid_eventType
+  @connected_network_type_subscriptions_400.03_invalid_eventType
   Scenario: Subscription creation with invalid event type
     Given the request body is compliant with the schema "#/components/schemas/SubscriptionRequest"
     And the request body property "$.types" is set to a value other than "org.camaraproject.connected-network-type-subscriptions.v0.network-type-changed"
@@ -298,7 +299,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.code" is "INVALID_ARGUMENT"
     And the response property "$.message" contains a user friendly text
 
-  @connected_network_type_subscriptions_400.4_invalid_protocol
+  @connected_network_type_subscriptions_400.04_invalid_protocol
   Scenario: subscription creation with invalid protocol
     Given the request body is compliant with the schema "#/components/schemas/SubscriptionRequest"
     And the request property "$.protocol" is not equal to "HTTP"
@@ -308,7 +309,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.code" is "INVALID_PROTOCOL"
     And the response property "$.message" contains a user friendly text
 
-  @connected_network_type_subscriptions_400.5_create_subscription_with_invalid_credential_type
+  @connected_network_type_subscriptions_400.05_create_subscription_with_invalid_credential_type
   Scenario: subscription creation with invalid credential type
     Given the request body is compliant with the schema "#/components/schemas/SubscriptionRequest"
     And the request property "$.sinkCredential.accessTokenType" is equal to "bearer"
@@ -319,7 +320,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.code" is "INVALID_CREDENTIAL"
     And the response property "$.message" contains a user friendly text
 
-  @connected_network_type_subscriptions_400.6_create_subscription_with_invalid_access_token_type
+  @connected_network_type_subscriptions_400.06_create_subscription_with_invalid_access_token_type
   Scenario: subscription creation with invalid token
     Given the request body is compliant with the schema "#/components/schemas/SubscriptionRequest"
     And the request property "$.sinkCredential.credentialType" is equal to "ACCESSTOKEN"
@@ -330,7 +331,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.code" is "INVALID_TOKEN"
     And the response property "$.message" contains a user friendly text
 
-  @connected_network_type_subscriptions_400.7_create_subscription_with_invalid_sink_url
+  @connected_network_type_subscriptions_400.07_create_subscription_with_invalid_sink_url
   Scenario: Subscription creation with invalid url
     Given the request body is compliant with the schema "#/components/schemas/SubscriptionRequest"
     And the request property "$.protocol" is set to "HTTP"
@@ -344,7 +345,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
 # Error code 401
 ##################
 
-  @connected_network_type_subscriptions_creation_401.1_no_authorization_header
+  @connected_network_type_subscriptions_creation_401.01_no_authorization_header
   Scenario: No Authorization header when creating subscription
     Given the request header "Authorization" is removed
     And the request body is compliant with the schema "#/components/schemas/SubscriptionRequest"
@@ -355,7 +356,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.code" is "UNAUTHENTICATED"
     And the response property "$.message" contains a user friendly text
 
-  @connected_network_type_subscriptions_creation_401.2_expired_access_token
+  @connected_network_type_subscriptions_creation_401.02_expired_access_token
   Scenario: Expired access token when creating subscription
     Given the header "Authorization" is set to a previously valid but now expired access token
     And the request body is compliant with the schema "#/components/schemas/SubscriptionRequest"
@@ -366,7 +367,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.code" is "UNAUTHENTICATED"
     And the response property "$.message" contains a user friendly text
 
-  @connected_network_type_subscriptions_creation_401.3_malformed_access_token
+  @connected_network_type_subscriptions_creation_401.03_malformed_access_token
   Scenario: Malformed access token when creating subscription
     Given the header "Authorization" is set to a malformed token
     And the request body is compliant with the schema "#/components/schemas/SubscriptionRequest"
@@ -381,7 +382,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
 # Error code 403
 ##################
 
-  @connected_network_type_subscriptions_create_403.1_permission_denied
+  @connected_network_type_subscriptions_create_403.01_permission_denied
   Scenario: subscription creation without having the required scope
     # To test this, a token must not have the required scope
     Given the access token does not include scope "connected-network-type-subscriptions:org.camaraproject.connected-network-type-subscriptions.v0.network-type-changed:create"
@@ -393,7 +394,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.code" is "PERMISSION_DENIED"
     And the response property "$.message" contains a user friendly text
 
-  @connected_network_type_subscriptions_create_403.2_subscription_mismatch_for_requested_events_subscription
+  @connected_network_type_subscriptions_create_403.02_subscription_mismatch_for_requested_events_subscription
   Scenario: Subscription creation with invalid access token for requested events subscription
     # Note - currently "org.camaraproject.connected-network-type-subscriptions.v0.network-type-changed" is the only valid subscription type for this API
     Given the access token includes only a single subscription scope
@@ -409,10 +410,11 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
 # Error code 422
 ##################
 
+  # Note that the test conditions for this test cannot be satisified for the current definition of #/components/schemas/SubscriptionRequest
   @connected_network_type_subscriptions_422.01_multi_event_not_supported
   Scenario: Multi-event subscriptions are not supported
     Given a valid 2- or 3-legged access token
-    And a request body that is compliant with the OAS schema at "#/component/schemas/SubscriptionRequest"
+    And a request body that is compliant with the OAS schema at "#/components/schemas/SubscriptionRequest"
     And request property "$.types" includes more than one subscription-type
     When the request "createConnectedNetworkTypeSubscription" is sent
     Then the response status code is 422
@@ -429,4 +431,33 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     Then the response code is 422
     And the response property "$.status" is 422
     And the response property "$.code" is "PRIVATE_KEY_JWT_NOT_CONFIGURED"
+    And the response property "$.message" contains a user friendly text
+
+
+#################
+# Error code 429
+#################
+
+  @connected_network_type_subscriptions_create_429.01_Too_Many_Requests
+  #To test this scenario environment has to be configured to reject requests reaching the threshold limit set.
+  Scenario: Request is rejected due to threshold policy
+    Given a valid request for "createConnectedNetworkTypeSubscription"
+    And the header "Authorization" is set to a valid access token
+    And the threshold of requests has been reached
+    When the request "createConnectedNetworkTypeSubscription" is sent
+    Then the response status code is 429
+    And the response property "$.status" is 429
+    And the response property "$.code" is "TOO_MANY_REQUESTS"
+    And the response property "$.message" contains a user friendly text
+
+  @connected_network_type_subscriptions_create_429.02_Quota_Exceeded
+  #To test this scenario environment has to be configured to reject requests reaching the allocated quota.
+  Scenario: Request is rejected due to API consumer quota being reached
+    Given a valid request for "createConnectedNetworkTypeSubscription"
+    And the header "Authorization" is set to a valid access token
+    And the API consumer allocated quota of requests has been reached
+    When the request "createConnectedNetworkTypeSubscription" is sent
+    Then the response status code is 429
+    And the response property "$.status" is 429
+    And the response property "$.code" is "QUOTA_EXCEEDED"
     And the response property "$.message" contains a user friendly text
