@@ -433,7 +433,6 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
     And the response property "$.code" is "PRIVATE_KEY_JWT_NOT_CONFIGURED"
     And the response property "$.message" contains a user friendly text
 
-
 #################
 # Error code 429
 #################
