@@ -77,18 +77,16 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation retri
     And the response body property "$.sinkCredential.jwksUri" is set to a valid value
 
 ##################
-# Error scenarios for management of input parameter device
-##################
-
-##################
 # Error code 400
 ##################
+
+# No test scenarios yet defined
 
 ##################
 # Error code 401
 ##################
 
-  @connected_network_type_subscriptions_retrieve_401.1_no_authorization_header
+  @connected_network_type_subscriptions_retrieve_401.01_no_authorization_header
   Scenario: No Authorization header when retrieving subscriptions
     Given the request header "Authorization" is removed
     When the request "retrieveConnectedNetworkTypeSubscription" is sent
@@ -98,7 +96,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation retri
     And the response property "$.code" is "UNAUTHENTICATED"
     And the response property "$.message" contains a user friendly text
 
-  @connected_network_type_subscriptions_retrieve_401.2_expired_access_token
+  @connected_network_type_subscriptions_retrieve_401.02_expired_access_token
   Scenario: Expired access token when retrieving subscriptions
     Given the header "Authorization" is set to a previously valid but now expired access token
     When the request "retrieveConnectedNetworkTypeSubscription" is sent
@@ -108,7 +106,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation retri
     And the response property "$.code" is "UNAUTHENTICATED"
     And the response property "$.message" contains a user friendly text
 
-  @connected_network_type_subscriptions_retrieve_401.3_malformed_access_token
+  @connected_network_type_subscriptions_retrieve_401.03_malformed_access_token
   Scenario: Malformed access token when retrieving subscriptions
     Given the header "Authorization" is set to a malformed token
     When the request "retrieveConnectedNetworkTypeSubscription" is sent
@@ -121,6 +119,8 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation retri
 ##################
 # Error code 403
 ##################
+
+# No test scenarios yet defined
 
 ##################
 # Error code 404
