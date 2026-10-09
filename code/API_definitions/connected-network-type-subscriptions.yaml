@@ -11,13 +11,15 @@ info:
 
     # Relevant terms and definitions
 
-    * **Device**: A device refers to any physical hardware that can connect to a mobile network and participate in network communication.
+    * **Device**:\
+        A device refers to any physical hardware that can connect to a mobile network and participate in network communication.
 
-        At least one identifier for the device out of four options must be provided: IPv4 address, IPv6 address, Phone number, or Network Access Identifier assigned by the mobile network operator for the device. Where more than one device identifier is provided, only one identifier will be selected by the implementation and this choice indicated to the API consumer in the subscription creation response.
+        At least one identifier for the device out of four options must be provided: IPv4 address, IPv6 address, phone number, or network access identifier assigned by the mobile network operator for the device. Where more than one device identifier is provided, only one identifier will be selected by the implementation and this choice indicated to the API consumer in the subscription creation response.
 
         Note: Network Access Identifier is defined for future use and will not be supported with this version of the API.
 
-    * **Connected Network Type**: This identifies the type of mobile technology of the network that the device is connected to (e.g. 4G, 5G, etc). It is the same as what is displayed on the device (e.g. on mobile phones). When the device moves across different areas of the network, the technology may change. As each technology is different, network capabilities may differ and MUST be checked with the API provider.
+    * **Connected Network Type**:\
+        This identifies the type of mobile technology of the network that the device is connected to (e.g. 4G, 5G, etc). It is the same as what is displayed on the device (e.g. on mobile phones). When the device moves across different areas of the network, the technology may change. As each technology is different, network capabilities may differ and MUST be checked with the API provider.
        - `2G`, if device is connected to the 2G network technology (alternative indicators such as "G" or "E" may be displayed on the device)
        - `3G`, if device is connected to the 3G network technology (alternative indicators such as "H" or "H+" may be displayed on the device)
        - `4G`, if device is connected to the 4G network technology (alternative indicators such as "LTE" or "LTE+" may be displayed on the device)
@@ -43,7 +45,7 @@ info:
       - `org.camaraproject.connected-network-type-subscriptions.v0.subscription-updated` is sent when the subscription is updated.
       - `org.camaraproject.connected-network-type-subscriptions.v0.subscription-ended` is sent when the subscription ends.
 
-    The `subscription-ended` event may used in following cases:
+    The `subscription-ended` event may be used in following cases:
       - the subscription expire time (optionally set by the requester) has been reached
       - the maximum number of subscription events (optionally set by the requester) has been reached
       - the subscription was deleted by the API consumer
