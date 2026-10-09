@@ -104,7 +104,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
   @connected_network_type_subscriptions_04_subscription_expiry
   Scenario: Receive notification for subscription-ended event on expiry
     Given a valid subscription for a device exists with "subscriptionId" equal to "id"
-    And the subscription property "$.subscriptionExpireTime" is set to a value in the near future
+    And the subscription property "$.config.subscriptionExpireTime" is set to a value in the near future
     And the subscription property "$.sink" is a valid callback URL
     When the subscriptionExpireTime is reached
     Then a subscription termination event notification is sent to the callback URL
@@ -116,7 +116,7 @@ Feature: CAMARA Connected Network Type Subscriptions API, vwip - Operation creat
   @connected_network_type_subscriptions_05_subscription_end_when_max_events
   Scenario: Receive notification for subscription-ended event on max events reached
     Given a valid subscription for a device exists with "subscriptionId" equal to "id"
-    And the subscription property "$.subscriptionMaxEvents" is set to 1
+    And the subscription property "$.config.subscriptionMaxEvents" is set to 1
     And the subscription property "$.sink" is a valid callback URL
     When a single notification corresponding to subscription property "$.type" has been sent to the callback URL
     Then a subscription termination event notification is sent to the callback URL
